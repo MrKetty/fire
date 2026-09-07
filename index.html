@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire OS — Downloads</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ══════════════════════════════════════════
+           RESET & BASE
+           ══════════════════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --fire-1: #ff4500;
+            --fire-2: #ff6a00;
+            --fire-3: #ff8c00;
+            --fire-4: #ffa500;
+            --fire-5: #ffd700;
+            --ember: #ff2d00;
+            --lava: #c41e00;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 15, 10, 0.6);
+            --text: #f0e6d6;
+            --text-dim: #9a8d7e;
+            --glow-orange: 0 0 40px rgba(255,100,0,0.4);
+            --glow-red: 0 0 60px rgba(255,45,0,0.3);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════════════════════
+           PARTICLE CANVAS
+           ══════════════════════════════════════════ */
+        #particles-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ══════════════════════════════════════════
+           ANIMATED BACKGROUND GRADIENTS
+           ══════════════════════════════════════════ */
+        .bg-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: 0;
+            pointer-events: none;
+            animation: floatGlow 8s ease-in-out infinite alternate;
+        }
+        .bg-glow.g1 { width: 600px; height: 600px; background: rgba(255,69,0,0.12); top: -200px; left: -100px; animation-delay: 0s; }
+        .bg-glow.g2 { width: 500px; height: 500px; background: rgba(255,140,0,0.08); bottom: -150px; right: -100px; animation-delay: 2s; animation-duration: 10s; }
+        .bg-glow.g3 { width: 400px; height: 400px; background: rgba(255,45,0,0.1); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 4s; animation-duration: 12s; }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -30px) scale(1.15); }
+        }
+
+        /* ══════════════════════════════════════════
+           NOISE OVERLAY
+           ══════════════════════════════════════════ */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* ══════════════════════════════════════════
+           SCANLINE EFFECT
+           ══════════════════════════════════════════ */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.03) 2px,
+                rgba(0,0,0,0.03) 4px
+            );
+        }
+
+        /* ══════════════════════════════════════════
+           HEADER / NAVBAR
+           ══════════════════════════════════════════ */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
+            background: rgba(10,10,15,0.7);
+            border-bottom: 1px solid rgba(255,100,0,0.15);
+            transition: all 0.4s ease;
+        }
+        .navbar.scrolled {
+            padding: 10px 40px;
+            background: rgba(10,10,15,0.9);
+            box-shadow: 0 4px 30px rgba(255,69,0,0.1);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .nav-logo {
+            font-size: 28px;
+            animation: flamePulse 2s ease-in-out infinite;
+        }
+        @keyframes flamePulse {
+            0%, 100% { transform: scale(1) rotate(-5deg); filter: brightness(1); }
+            50% { transform: scale(1.15) rotate(5deg); filter: brightness(1.3); }
+        }
+        .nav-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--fire-5), var(--fire-2), var(--fire-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-links a:hover {
+            color: var(--fire-4);
+            background: rgba(255,100,0,0.08);
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%; right: 50%;
+            height: 2px;
+            background: var(--fire-2);
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover::after { left: 18px; right: 18px; }
+
+        .nav-version {
+            font-family: 'Orbitron', monospace;
+            font-size: 11px;
+            color: var(--fire-3);
+            background: rgba(255,100,0,0.08);
+            border: 1px solid rgba(255,100,0,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* ══════════════════════════════════════════
+           HERO SECTION
+           ══════════════════════════════════════════ */
+        .hero {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 20px;
+            border-radius: 100px;
+            background: rgba(255,100,0,0.06);
+            border: 1px solid rgba(255,100,0,0.2);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--fire-3);
+            margin-bottom: 30px;
+            animation: fadeSlideDown 0.8s ease-out 0.2s both;
+        }
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--fire-2);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(48px, 8vw, 100px);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            animation: fadeSlideDown 0.8s ease-out 0.4s both;
+        }
+        .hero-title .fire-text {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--fire-5) 0%, var(--fire-3) 25%, var(--fire-1) 50%, var(--ember) 75%, var(--lava) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(255,100,0,0.3));
+        }
+        .hero-title .os-text {
+            display: inline-block;
+            color: var(--text);
+            -webkit-text-fill-color: var(--text);
+            opacity: 0.9;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(18px, 2.5vw, 26px);
+            font-weight: 300;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 50px;
+            line-height: 1.5;
+            animation: fadeSlideDown 0.8s ease-out 0.6s both;
+        }
+        .hero-subtitle strong {
+            color: var(--fire-4);
+            font-weight: 600;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeSlideDown 0.8s ease-out 0.8s both;
+        }
+
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--fire-1), var(--fire-2));
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 25px rgba(255,69,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(255,69,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s ease;
+        }
+        .btn-primary:hover::before { left: 100%; }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--fire-3);
+            background: transparent;
+            border: 1px solid rgba(255,140,0,0.3);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,100,0,0.08);
+            border-color: var(--fire-2);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 25px rgba(255,100,0,0.15);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: fadeSlideDown 0.8s ease-out 1.2s both;
+        }
+        .scroll-indicator span {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .scroll-mouse {
+            width: 24px;
+            height: 38px;
+            border: 2px solid rgba(255,140,0,0.3);
+            border-radius: 12px;
+            position: relative;
+        }
+        .scroll-mouse::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 8px;
+            background: var(--fire-3);
+            border-radius: 2px;
+            animation: scrollWheel 2s ease-in-out infinite;
+        }
+        @keyframes scrollWheel {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+        }
+
+        /* ══════════════════════════════════════════
+           STATS BAR
+           ══════════════════════════════════════════ */
+        .stats-bar {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255,100,0,0.08);
+            border-bottom: 1px solid rgba(255,100,0,0.08);
+            background: rgba(10,10,15,0.5);
+            backdrop-filter: blur(10px);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--fire-5), var(--fire-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* ══════════════════════════════════════════
+           DOWNLOADS SECTION
+           ══════════════════════════════════════════ */
+        .downloads-section {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .section-tag {
+            display: inline-block;
+            font-family: 'Orbitron', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--fire-3);
+            margin-bottom: 16px;
+            padding: 6px 16px;
+            background: rgba(255,100,0,0.06);
+            border: 1px solid rgba(255,100,0,0.15);
+            border-radius: 100px;
+        }
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+        .section-desc {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Search & Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text);
+            background: rgba(20,15,10,0.6);
+            border: 1px solid rgba(255,100,0,0.15);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-box input::placeholder { color: var(--text-dim); }
+        .search-box input:focus {
+            border-color: var(--fire-2);
+            box-shadow: 0 0 20px rgba(255,100,0,0.1);
+        }
+        .search-box svg {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(20,15,10,0.6);
+            border: 1px solid rgba(255,100,0,0.15);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .view-toggle button {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        .view-toggle button.active {
+            background: rgba(255,100,0,0.12);
+            color: var(--fire-3);
+        }
+        .view-toggle button:hover:not(.active) {
+            background: rgba(255,100,0,0.05);
+        }
+
+        /* File Count */
+        .file-count {
+            font-family: 'Orbitron', monospace;
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+        .file-count strong {
+            color: var(--fire-4);
+        }
+
+        /* ══════════════════════════════════════════
+           FILE GRID
+           ══════════════════════════════════════════ */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .file-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .file-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,100,0,0.1);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            animation: cardAppear 0.5s ease-out both;
+        }
+        .file-card:nth-child(1) { animation-delay: 0.05s; }
+        .file-card:nth-child(2) { animation-delay: 0.1s; }
+        .file-card:nth-child(3) { animation-delay: 0.15s; }
+        .file-card:nth-child(4) { animation-delay: 0.2s; }
+        .file-card:nth-child(5) { animation-delay: 0.25s; }
+        .file-card:nth-child(6) { animation-delay: 0.3s; }
+        .file-card:nth-child(7) { animation-delay: 0.35s; }
+        .file-card:nth-child(8) { animation-delay: 0.4s; }
+        .file-card:nth-child(9) { animation-delay: 0.45s; }
+        .file-card:nth-child(10) { animation-delay: 0.5s; }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .file-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,100,0,0.05), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        .file-card:hover::before { opacity: 1; }
+        .file-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255,100,0,0.3);
+            box-shadow: 0 12px 40px rgba(255,69,0,0.15), 0 0 0 1px rgba(255,100,0,0.1);
+        }
+
+        /* Fire glow line on top */
+        .file-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--fire-2), var(--fire-4), var(--fire-2), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .file-card:hover::after { opacity: 1; }
+
+        .file-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .file-icon-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+        .file-card:hover .file-icon-wrapper {
+            transform: rotate(-5deg) scale(1.08);
+        }
+
+        .file-icon-wrapper.exe { background: linear-gradient(135deg, rgba(255,69,0,0.15), rgba(255,140,0,0.08)); border: 1px solid rgba(255,69,0,0.2); }
+        .file-icon-wrapper.zip { background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.08)); border: 1px solid rgba(255,215,0,0.2); }
+        .file-icon-wrapper.img { background: linear-gradient(135deg, rgba(0,200,255,0.15), rgba(0,150,255,0.08)); border: 1px solid rgba(0,200,255,0.2); }
+        .file-icon-wrapper.doc { background: linear-gradient(135deg, rgba(100,255,100,0.15), rgba(50,200,50,0.08)); border: 1px solid rgba(100,255,100,0.2); }
+        .file-icon-wrapper.media { background: linear-gradient(135deg, rgba(200,100,255,0.15), rgba(150,50,255,0.08)); border: 1px solid rgba(200,100,255,0.2); }
+        .file-icon-wrapper.default { background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(255,100,0,0.08)); border: 1px solid rgba(255,140,0,0.2); }
+
+        .file-info { flex: 1; min-width: 0; }
+
+        .file-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            word-break: break-all;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+        .file-ext {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--fire-3);
+            font-weight: 600;
+        }
+
+        .file-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .file-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        .file-meta-item svg { width: 14px; height: 14px; opacity: 0.6; }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 20px;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(255,69,0,0.8), rgba(255,106,0,0.8));
+            border: 1px solid rgba(255,100,0,0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .download-btn:hover {
+            background: linear-gradient(135deg, var(--fire-1), var(--fire-2));
+            box-shadow: 0 4px 20px rgba(255,69,0,0.3);
+            transform: translateY(-2px);
+        }
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        .download-btn:hover::before { left: 100%; }
+
+        /* List view adjustments */
+        .file-grid.list-view .file-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 24px;
+        }
+        .file-grid.list-view .file-card-header {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        .file-grid.list-view .file-meta {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        .file-grid.list-view .download-btn {
+            width: auto;
+            padding: 10px 24px;
+        }
+
+        /* ══════════════════════════════════════════
+           LOADING STATES
+           ══════════════════════════════════════════ */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 80px 20px;
+        }
+        .fire-loader {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+        .fire-loader .flame {
+            position: absolute;
+            bottom: 0;
+            width: 20px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flameRise 0.8s ease-in-out infinite alternate;
+        }
+        .fire-loader .flame:nth-child(1) {
+            left: 5px; height: 30px;
+            background: var(--fire-1);
+            animation-delay: 0s;
+        }
+        .fire-loader .flame:nth-child(2) {
+            left: 20px; height: 40px;
+            background: var(--fire-3);
+            animation-delay: 0.15s;
+        }
+        .fire-loader .flame:nth-child(3) {
+            left: 35px; height: 25px;
+            background: var(--fire-5);
+            animation-delay: 0.3s;
+        }
+        @keyframes flameRise {
+            0% { height: 20px; opacity: 0.7; }
+            100% { height: 45px; opacity: 1; }
+        }
+        .loading-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: var(--fire-3);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Error State */
+        .error-container {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .error-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--fire-1);
+            margin-bottom: 12px;
+        }
+        .error-desc {
+            color: var(--text-dim);
+            font-size: 16px;
+            max-width: 400px;
+            margin: 0 auto 24px;
+        }
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            font-family: 'Orbitron', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--fire-3);
+            background: rgba(255,100,0,0.08);
+            border: 1px solid rgba(255,100,0,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .retry-btn:hover {
+            background: rgba(255,100,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: flamePulse 3s ease-in-out infinite;
+        }
+
+        /* ══════════════════════════════════════════
+           FEATURES SECTION
+           ══════════════════════════════════════════ */
+        .features-section {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,100,0,0.08);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+        .feature-card:hover {
+            border-color: rgba(255,100,0,0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(255,69,0,0.1);
+        }
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+        .feature-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .feature-desc {
+            font-size: 15px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* ══════════════════════════════════════════
+           FOOTER
+           ══════════════════════════════════════════ */
+        footer {
+            position: relative;
+            z-index: 2;
+            border-top: 1px solid rgba(255,100,0,0.1);
+            padding: 40px 24px;
+            text-align: center;
+        }
+        .footer-brand {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--fire-5), var(--fire-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .footer-copy {
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+        }
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+        .footer-links a:hover { color: var(--fire-3); }
+
+        /* ══════════════════════════════════════════
+           CURSOR GLOW EFFECT
+           ══════════════════════════════════════════ */
+        .cursor-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(circle, rgba(255,100,0,0.06) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+        }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 20px; }
+            .nav-links { display: none; }
+            .stats-bar { gap: 30px; flex-wrap: wrap; }
+            .stat-number { font-size: 28px; }
+            .file-grid { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; }
+            .search-box { min-width: unset; width: 100%; }
+            .hero-cta { flex-direction: column; align-items: center; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+        }
+
+        /* ══════════════════════════════════════════
+           CUSTOM SCROLLBAR
+           ══════════════════════════════════════════ */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,100,0,0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,100,0,0.5); }
+
+        /* ══════════════════════════════════════════
+           TOAST NOTIFICATION
+           ══════════════════════════════════════════ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            padding: 14px 24px;
+            background: rgba(20,15,10,0.95);
+            border: 1px solid rgba(255,100,0,0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Effects -->
+    <canvas id="particles-canvas"></canvas>
+    <div class="bg-glow g1"></div>
+    <div class="bg-glow g2"></div>
+    <div class="bg-glow g3"></div>
+    <div class="noise-overlay"></div>
+    <div class="scanlines"></div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-brand">
+            <span class="nav-logo">🔥</span>
+            <span class="nav-title">FIRE OS</span>
+        </a>
+        <div class="nav-links">
+            <a href="#downloads">Downloads</a>
+            <a href="#features">Features</a>
+            <a href="https://github.com/mrketty/fire" target="_blank">GitHub</a>
+        </div>
+        <span class="nav-version">v1.0</span>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Open Source Downloads
+        </div>
+        <h1 class="hero-title">
+            <span class="fire-text">FIRE</span> <span class="os-text">OS</span>
+        </h1>
+        <p class="hero-subtitle">
+            The blazing-fast download hub.<br>
+            Get your <strong>files</strong> straight from the source. 🔥
+        </p>
+        <div class="hero-cta">
+            <a href="#downloads" class="btn-primary">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Browse Downloads
+            </a>
+            <a href="https://github.com/mrketty/fire" target="_blank" class="btn-secondary">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                View on GitHub
+            </a>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number" id="fileCountStat">—</div>
+            <div class="stat-label">Files Available</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="totalSizeStat">LIVE</div>
+            <div class="stat-label">Status</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">∞</div>
+            <div class="stat-label">Downloads</div>
+        </div>
+    </div>
+
+    <!-- Downloads Section -->
+    <section class="downloads-section" id="downloads">
+        <div class="section-header">
+            <div class="section-tag">📦 Repository</div>
+            <h2 class="section-title">Available Downloads</h2>
+            <p class="section-desc">All files are served directly from our GitHub repository. Fresh & always up-to-date.</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="search-box">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="searchInput" placeholder="Search files...">
+            </div>
+            <div class="view-toggle">
+                <button id="gridViewBtn" class="active" title="Grid View">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                </button>
+                <button id="listViewBtn" title="List View">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="file-count" id="fileCount"></div>
+        <div class="file-grid" id="fileGrid">
+            <!-- Loading State -->
+            <div class="loading-container" id="loadingState" style="grid-column: 1 / -1;">
+                <div class="fire-loader">
+                    <div class="flame"></div>
+                    <div class="flame"></div>
+                    <div class="flame"></div>
+                </div>
+                <div class="loading-text">Loading files...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <div class="section-tag">⚡ Why Fire OS</div>
+            <h2 class="section-title">Built Different</h2>
+            <p class="section-desc">Lightning-fast, always updated, zero hassle.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">Instant Access</h3>
+                <p class="feature-desc">Direct downloads from GitHub with zero redirects. Your files, one click away.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Auto-Sync</h3>
+                <p class="feature-desc">New files appear automatically. No rebuild needed — the site detects changes in real time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Open Source</h3>
+                <p class="feature-desc">Fully transparent. Every file served from a public GitHub repository you can inspect.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-brand">🔥 FIRE OS</div>
+        <p class="footer-copy">© 2026 Fire OS — All rights reserved.</p>
+        <div class="footer-links">
+            <a href="https://github.com/mrketty/fire" target="_blank">GitHub</a>
+            <a href="#downloads">Downloads</a>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+    /* ══════════════════════════════════════════
+       CONFIGURATION
+       ══════════════════════════════════════════ */
+    const CONFIG = {
+        owner: 'mrketty',
+        repo: 'fire',
+        branch: 'main',
+        folder: 'file',
+        get listaUrl() {
+            return `https://raw.githubusercontent.com/${this.owner}/${this.repo}/${this.branch}/${this.folder}/lista.txt`;
+        }
+    };
+
+    /* ══════════════════════════════════════════
+       FILE TYPE MAPPINGS
+       ══════════════════════════════════════════ */
+    const FILE_TYPES = {
+        exe:  { icon: '⚙️', label: 'Executable', category: 'exe' },
+        msi:  { icon: '📦', label: 'Installer', category: 'exe' },
+        apk:  { icon: '🤖', label: 'Android App', category: 'exe' },
+        dmg:  { icon: '🍎', label: 'Mac Installer', category: 'exe' },
+        deb:  { icon: '🐧', label: 'Linux Package', category: 'exe' },
+        rpm:  { icon: '🐧', label: 'Linux Package', category: 'exe' },
+        appimage: { icon: '🐧', label: 'AppImage', category: 'exe' },
+        zip:  { icon: '🗜️', label: 'Archive', category: 'zip' },
+        rar:  { icon: '🗜️', label: 'Archive', category: 'zip' },
+        '7z': { icon: '🗜️', label: 'Archive', category: 'zip' },
+        tar:  { icon: '🗜️', label: 'Archive', category: 'zip' },
+        gz:   { icon: '🗜️', label: 'Archive', category: 'zip' },
+        xz:   { icon: '🗜️', label: 'Archive', category: 'zip' },
+        png:  { icon: '🖼️', label: 'Image', category: 'img' },
+        jpg:  { icon: '🖼️', label: 'Image', category: 'img' },
+        jpeg: { icon: '🖼️', label: 'Image', category: 'img' },
+        gif:  { icon: '🖼️', label: 'GIF', category: 'img' },
+        svg:  { icon: '🎨', label: 'Vector', category: 'img' },
+        webp: { icon: '🖼️', label: 'Image', category: 'img' },
+        ico:  { icon: '🖼️', label: 'Icon', category: 'img' },
+        pdf:  { icon: '📄', label: 'PDF Document', category: 'doc' },
+        doc:  { icon: '📝', label: 'Document', category: 'doc' },
+        docx: { icon: '📝', label: 'Document', category: 'doc' },
+        txt:  { icon: '📃', label: 'Text File', category: 'doc' },
+        md:   { icon: '📋', label: 'Markdown', category: 'doc' },
+        csv:  { icon: '📊', label: 'Spreadsheet', category: 'doc' },
+        xlsx: { icon: '📊', label: 'Spreadsheet', category: 'doc' },
+        mp3:  { icon: '🎵', label: 'Audio', category: 'media' },
+        wav:  { icon: '🎵', label: 'Audio', category: 'media' },
+        flac: { icon: '🎵', label: 'Audio', category: 'media' },
+        mp4:  { icon: '🎬', label: 'Video', category: 'media' },
+        mkv:  { icon: '🎬', label: 'Video', category: 'media' },
+        avi:  { icon: '🎬', label: 'Video', category: 'media' },
+        iso:  { icon: '💿', label: 'Disk Image', category: 'exe' },
+        img:  { icon: '💿', label: 'Disk Image', category: 'exe' },
+        bin:  { icon: '💾', label: 'Binary', category: 'exe' },
+        dll:  { icon: '🔧', label: 'Library', category: 'exe' },
+        bat:  { icon: '⚡', label: 'Script', category: 'exe' },
+        sh:   { icon: '⚡', label: 'Script', category: 'exe' },
+        ps1:  { icon: '⚡', label: 'PowerShell', category: 'exe' },
+        py:   { icon: '🐍', label: 'Python', category: 'doc' },
+        js:   { icon: '🟨', label: 'JavaScript', category: 'doc' },
+        json: { icon: '📋', label: 'JSON', category: 'doc' },
+        xml:  { icon: '📋', label: 'XML', category: 'doc' },
+        cfg:  { icon: '⚙️', label: 'Config', category: 'doc' },
+        ini:  { icon: '⚙️', label: 'Config', category: 'doc' },
+        yaml: { icon: '⚙️', label: 'Config', category: 'doc' },
+        yml:  { icon: '⚙️', label: 'Config', category: 'doc' },
+        toml: { icon: '⚙️', label: 'Config', category: 'doc' },
+    };
+
+    function getFileType(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        return FILE_TYPES[ext] || { icon: '📁', label: 'File', category: 'default' };
+    }
+
+    /* Extract the real filename from a URL (last path segment, decoded) */
+    function getFilenameFromUrl(url) {
+        try {
+            const pathname = new URL(url).pathname;
+            const segments = pathname.split('/').filter(Boolean);
+            return decodeURIComponent(segments[segments.length - 1] || 'file');
+        } catch {
+            return url.split('/').pop() || 'file';
+        }
+    }
+
+    /* ══════════════════════════════════════════
+       FETCH FILES FROM lista.txt
+       ══════════════════════════════════════════
+       Format per line:  DisplayName - https://download-url
+       Lines starting with # or empty lines are ignored.
+       ══════════════════════════════════════════ */
+    let allFiles = [];
+
+    async function fetchFiles() {
+        try {
+            // Cache-busting so updates show immediately
+            const res = await fetch(CONFIG.listaUrl + '?t=' + Date.now());
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const text = await res.text();
+
+            allFiles = text
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line && !line.startsWith('#'))
+                .map(line => {
+                    // Split on " - " to separate name from URL
+                    const dashIdx = line.indexOf(' - ');
+                    if (dashIdx === -1) return null;
+
+                    const displayName = line.substring(0, dashIdx).trim();
+                    const url = line.substring(dashIdx + 3).trim();
+                    if (!displayName || !url) return null;
+
+                    // Get the real filename from URL for extension detection
+                    const realFilename = getFilenameFromUrl(url);
+
+                    return {
+                        name: displayName,
+                        realFilename: realFilename,
+                        download_url: url,
+                    };
+                })
+                .filter(Boolean);
+
+            renderFiles(allFiles);
+            updateStats(allFiles);
+
+        } catch (err) {
+            console.error('Error fetching lista.txt:', err);
+            showError(err.message);
+        }
+    }
+
+    function updateStats(files) {
+        document.getElementById('fileCountStat').textContent = files.length;
+        document.getElementById('totalSizeStat').textContent = files.length > 0 ? '🔥' : '—';
+    }
+
+    /* ══════════════════════════════════════════
+       RENDER FILE CARDS
+       ══════════════════════════════════════════ */
+    function renderFiles(files) {
+        const grid = document.getElementById('fileGrid');
+        const countEl = document.getElementById('fileCount');
+
+        if (files.length === 0 && allFiles.length > 0) {
+            // Search returned no results
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">🔍</div>
+                    <h3 style="font-family:'Orbitron',monospace; font-size:20px; margin-bottom:8px;">No matches found</h3>
+                    <p style="color:var(--text-dim);">Try a different search term</p>
+                </div>`;
+            countEl.innerHTML = `<strong>0</strong> files found`;
+            return;
+        }
+
+        if (files.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">🔥</div>
+                    <h3 style="font-family:'Orbitron',monospace; font-size:20px; margin-bottom:8px;">No files yet</h3>
+                    <p style="color:var(--text-dim);">Add files to the <code>file/</code> folder in the repository.</p>
+                </div>`;
+            countEl.innerHTML = `<strong>0</strong> files available`;
+            return;
+        }
+
+        countEl.innerHTML = `Showing <strong>${files.length}</strong> file${files.length > 1 ? 's' : ''}`;
+
+        grid.innerHTML = files.map((file, i) => {
+            const type = getFileType(file.realFilename);
+            const ext = file.realFilename.includes('.') ? file.realFilename.split('.').pop().toUpperCase() : 'FILE';
+            return `
+            <div class="file-card" style="animation-delay:${Math.min(i * 0.05, 0.5)}s">
+                <div class="file-card-header">
+                    <div class="file-icon-wrapper ${type.category}">
+                        ${type.icon}
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">${escapeHtml(file.name)}</div>
+                        <div class="file-ext">${type.label} • .${ext}</div>
+                    </div>
+                </div>
+                <div class="file-meta">
+                    <div class="file-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                        ${escapeHtml(file.realFilename)}
+                    </div>
+                </div>
+                <a href="${escapeHtml(file.download_url)}" class="download-btn" target="_blank" rel="noopener" onclick="showToast('Opening download for ${escapeHtml(file.name)}...')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download
+                </a>
+            </div>`;
+        }).join('');
+    }
+
+    function showError(msg) {
+        const grid = document.getElementById('fileGrid');
+        grid.innerHTML = `
+            <div class="error-container" style="grid-column: 1 / -1;">
+                <div class="error-icon">💥</div>
+                <h3 class="error-title">Connection Failed</h3>
+                <p class="error-desc">Could not reach the GitHub API. The repository might be private or the rate limit may have been exceeded.</p>
+                <button class="retry-btn" onclick="location.reload()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Retry
+                </button>
+            </div>`;
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    /* ══════════════════════════════════════════
+       SEARCH
+       ══════════════════════════════════════════ */
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        const filtered = allFiles.filter(f => f.name.toLowerCase().includes(q));
+        renderFiles(filtered);
+    });
+
+    /* ══════════════════════════════════════════
+       VIEW TOGGLE
+       ══════════════════════════════════════════ */
+    const gridBtn = document.getElementById('gridViewBtn');
+    const listBtn = document.getElementById('listViewBtn');
+    const fileGrid = document.getElementById('fileGrid');
+
+    gridBtn.addEventListener('click', () => {
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+        fileGrid.classList.remove('list-view');
+    });
+    listBtn.addEventListener('click', () => {
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        fileGrid.classList.add('list-view');
+    });
+
+    /* ══════════════════════════════════════════
+       TOAST
+       ══════════════════════════════════════════ */
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `🔥 ${msg}`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    /* ══════════════════════════════════════════
+       NAVBAR SCROLL EFFECT
+       ══════════════════════════════════════════ */
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ══════════════════════════════════════════
+       CURSOR GLOW
+       ══════════════════════════════════════════ */
+    const cursorGlow = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', (e) => {
+        cursorGlow.style.left = e.clientX + 'px';
+        cursorGlow.style.top = e.clientY + 'px';
+    });
+
+    /* ══════════════════════════════════════════
+       FIRE PARTICLES (CANVAS)
+       ══════════════════════════════════════════ */
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const PARTICLE_COUNT = 80;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + Math.random() * 100;
+            this.size = Math.random() * 3 + 1;
+            this.speedY = -(Math.random() * 1.5 + 0.3);
+            this.speedX = (Math.random() - 0.5) * 0.8;
+            this.life = 1;
+            this.decay = Math.random() * 0.008 + 0.003;
+            const colors = [
+                [255, 69, 0],   // orangered
+                [255, 106, 0],  // orange
+                [255, 140, 0],  // darkorange
+                [255, 165, 0],  // orange
+                [255, 215, 0],  // gold
+                [255, 45, 0],   // red-orange
+            ];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+            this.x += this.speedX + Math.sin(this.y * 0.01) * 0.3;
+            this.y += this.speedY;
+            this.life -= this.decay;
+            if (this.life <= 0) this.reset();
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${this.life * 0.4})`;
+            ctx.fill();
+
+            // Glow
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * this.life * 3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${this.life * 0.08})`;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const p = new Particle();
+        p.y = Math.random() * canvas.height; // spread initially
+        particles.push(p);
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* ══════════════════════════════════════════
+       INTERSECTION OBSERVER FOR ANIMATIONS
+       ══════════════════════════════════════════ */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+
+    /* ══════════════════════════════════════════
+       INIT
+       ══════════════════════════════════════════ */
+    fetchFiles();
+
+    </script>
+</body>
+</html>
